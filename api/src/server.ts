@@ -11,6 +11,10 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/api/v1/hello", (req, res) => {
+  res.send("Rentalord API is running");
+});
+
 app.use("/api/v1", routes);
 
 app.use(errorHandler);

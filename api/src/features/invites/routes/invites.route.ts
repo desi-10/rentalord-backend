@@ -5,7 +5,7 @@ import {
   authorizeAdmin,
 } from "../../../middlewares/auth.middleware.js";
 import { validateSchema } from "../../../middlewares/validate.middleware.js";
-import { createPropertyInviteSchema } from "../validators/property.validator.js";
+import { createInviteSchema } from "../validators/invites.validator.js";
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router
   .post(
     authenticate,
     authorizeAdmin,
-    validateSchema(createPropertyInviteSchema),
+    validateSchema(createInviteSchema),
     inviteController.createInviteController
   );
 

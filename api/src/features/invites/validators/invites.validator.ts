@@ -1,7 +1,7 @@
 // src/validations/property-invite.schema.ts
 import { z } from "zod";
 
-export const createPropertyInviteSchema = z.object({
+export const createInviteSchema = z.object({
   property_id: z.cuid(),
   phone_number: z
     .string()
@@ -23,8 +23,6 @@ export const acceptInviteSchema = z.object({
   user_id: z.cuid(), // the user accepting the invite
 });
 
-export type TypeCreatePropertyInvite = z.infer<
-  typeof createPropertyInviteSchema
->;
+export type TypeCreateInvite = z.infer<typeof createInviteSchema>;
 export type TypeUpdateInvite = z.infer<typeof updateInviteSchema>;
 export type TypeAcceptInvite = z.infer<typeof acceptInviteSchema>;
