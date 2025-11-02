@@ -6,13 +6,13 @@ import { generateCode } from "../../../utils/generate-code.js";
 import { apiResponse } from "../../../utils/api-response.js";
 import {
   TypeAcceptInvite,
-  TypeCreatePropertyInvite,
+  TypeCreateInvite,
   TypeUpdateInvite,
-} from "../validators/property.validator.js";
+} from "../validators/invites.validator.js";
 
 export const createInviteService = async (
   inviterId: string,
-  data: TypeCreatePropertyInvite
+  data: TypeCreateInvite
 ) => {
   const { property_id, phone_number, role } = data;
 
