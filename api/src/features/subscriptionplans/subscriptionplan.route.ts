@@ -12,10 +12,11 @@ import {
 
 const router = express.Router();
 
-router.use(authenticate, authorizeAdmin);
+router.get("/", subscriptionPlanController.getAllSubscriptionPlans);
 
+router.use(authenticate, authorizeAdmin);
 router
-  .route("/")
+  .route("/admin")
   .get(subscriptionPlanController.getAllSubscriptionPlans)
   .post(
     validateSchema(createSubscriptionPlanSchema),
@@ -23,7 +24,7 @@ router
   );
 
 router
-  .route("/:id")
+  .route("/:id/admin")
   .get(subscriptionPlanController.getSubscriptionPlanById)
   .patch(
     validateSchema(updateSubscritionPlanSchema),
