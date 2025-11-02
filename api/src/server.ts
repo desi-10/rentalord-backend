@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/v1/hello", (req, res) => {
-  res.send("Rentalord API is running");
+  res.send("Hello welcome to Rentalord API");
 });
 
 app.use("/api/v1", routes);
