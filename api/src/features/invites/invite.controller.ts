@@ -8,7 +8,7 @@ import {
   getInviteService,
   getInvitesService,
   updateInviteService,
-} from "../services/invites.service.js";
+} from "./invites.service.js";
 
 export const createInviteController = async (req: Request, res: Response) => {
   const inviterId = req.userId as string;

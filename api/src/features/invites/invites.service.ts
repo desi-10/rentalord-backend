@@ -1,14 +1,14 @@
 import { StatusCodes } from "http-status-codes";
 import crypto from "crypto";
-import { prisma } from "../../../utils/db.js";
-import { ApiError } from "../../../utils/api-error.js";
-import { generateCode } from "../../../utils/generate-code.js";
-import { apiResponse } from "../../../utils/api-response.js";
+import { prisma } from "../../utils/db.js";
+import { ApiError } from "../../utils/api-error.js";
+import { generateCode } from "../../utils/generate-code.js";
+import { apiResponse } from "../../utils/api-response.js";
 import {
   TypeAcceptInvite,
   TypeCreateInvite,
   TypeUpdateInvite,
-} from "../validators/invites.validator.js";
+} from "./invites.validator.js";
 
 export const createInviteService = async (
   inviterId: string,
