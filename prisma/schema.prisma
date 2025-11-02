@@ -1,0 +1,540 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or mysql / sqlite depending on your setup
+  url      = env("DATABASE_URL")
+}
+
+// ===================== ENUMS =====================
+
+enum SubscriptionStatus {
+  active
+  expired
+  canceled
+}
+
+enum VerificationStatus {
+  not_required
+  pending
+  approved
+  rejected
+}
+
+enum UnitType {
+  room
+  apartment
+  office
+  shop
+  container
+  other
+}
+
+enum UnitStatus {
+  available
+  occupied
+  maintenance
+}
+
+enum InviteRole {
+  tenant
+  manager
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  expired
+  revoked
+}
+
+enum MembershipRole {
+  landlord
+  tenant
+  manager
+}
+
+enum TenancyStatus {
+  pending
+  active
+  ended
+  terminated
+}
+
+enum PaymentFrequency {
+  daily
+  weekly
+  monthly
+  yearly
+}
+
+enum InvoiceType {
+  rent
+  deposit
+  refund
+  fee
+  other
+}
+
+enum InvoiceStatus {
+  pending
+  partial
+  paid
+  overdue
+  refunded
+}
+
+enum PaymentMethod {
+  cash
+  bank_transfer
+  mobile_money
+  card
+  other
+}
+
+enum MaintenancePriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum MaintenanceStatus {
+  pending
+  in_progress
+  resolved
+  cancelled
+}
+
+enum AssignmentStatus {
+  pending
+  in_progress
+  completed
+  cancelled
+}
+
+enum StaffSpecialization {
+  general_maintenance
+  plumber
+  electrician
+  carpenter
+  cleaner
+  painter
+  hvac_technician
+  security_personnel
+  gardener
+  pest_control
+  appliance_technician
+  other
+}
+
+enum AvailabilityStatus {
+  available
+  busy
+  inactive
+}
+
+enum ExpenseCategory {
+  maintenance
+  staff_payment
+  utilities
+  property_tax
+  insurance
+  management_fee
+  supplies
+  renovation
+  mortgage
+  marketing
+  legal
+  food
+  other
+}
+
+enum ExpensePaymentMethod {
+  cash
+  bank_transfer
+  mobile_money
+  cheque
+  others
+}
+
+enum ReportCategory {
+  maintenance
+  safety
+  noise
+  staff_behavior
+  other
+}
+
+enum ReportStatus {
+  new
+  under_review
+  resolved
+  dismissed
+}
+
+enum AccessRole {
+  user
+  superadmin
+}
+
+// ===================== MODELS =====================
+
+model User {
+  id                 String     @id @default(cuid())
+  phone_number       String     @unique
+  password           String
+  first_name         String?
+  last_name          String?
+  email              String?
+  access_role        AccessRole @default(user)
+  is_verified        Boolean    @default(false)
+  isTwoFactorEnabled Boolean    @default(false)
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @updatedAt
+
+  // Relations
+  subscriptions          Subscription[]
+  properties             Property[]              @relation("UserProperties")
+  verificationsApproved  PropertyVerification[]  @relation("VerifiedByUser")
+  verificationsSubmitted PropertyVerification[]  @relation("SubmittedByUser")
+  invitesSent            PropertyInvite[]        @relation("InvitesSent")
+  memberships            PropertyMembership[]
+  tenanciesAsTenant      Tenancy[]               @relation("TenantTenancies")
+  tenanciesAsLandlord    Tenancy[]               @relation("LandlordTenancies")
+  transactions           Transaction[]           @relation("TransactionRecorder")
+  maintenanceRequests    MaintenanceRequest[]
+  maintenanceAssigned    MaintenanceAssignment[] @relation("AssignedBy")
+  expenses               Expense[]
+  auditLogs              AuditLog[]
+  reportsReviewed        AnonymousReport[]       @relation("ReportsReviewed")
+  propertyProfile        PropertyUserProfile[]
+  staff                  Staff[]
+  otp                    OTP[]
+}
+
+model OTP {
+  id           String   @id @default(cuid())
+  code         String
+  phone_number String   @unique
+  purpose      String
+  expiresAt    DateTime
+  userId       String?
+  attempts     Int      @default(0)
+  user         User?    @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model LoginAttempt {
+  id           String    @id @default(cuid())
+  phone_number String    @unique
+  attempts     Int       @default(0)
+  lastAttempt  DateTime  @default(now())
+  lockedUntil  DateTime?
+  lockCount    Int       @default(0)
+}
+
+model SubscriptionPlan {
+  id               String   @id @default(cuid())
+  name             String   @unique
+  price            Decimal  @db.Decimal(10, 2)
+  duration_in_days Int
+  features         String?
+  max_properties   Int
+  max_units        Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  user_id           String
+  plan_id           String
+  start_date        DateTime
+  end_date          DateTime
+  status            SubscriptionStatus
+  payment_reference String?
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+
+  user User             @relation(fields: [user_id], references: [id])
+  plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
+}
+
+model Property {
+  id                  String             @id @default(cuid())
+  name                String
+  address             String
+  description         String?
+  created_by          String
+  number_of_units     Int                @default(0)
+  is_public           Boolean            @default(false)
+  verification_status VerificationStatus @default(not_required)
+  created_at          DateTime           @default(now())
+  updated_at          DateTime           @updatedAt
+
+  createdBy           User                   @relation("UserProperties", fields: [created_by], references: [id])
+  units               Unit[]
+  verifications       PropertyVerification[]
+  invites             PropertyInvite[]
+  memberships         PropertyMembership[]
+  profiles            PropertyUserProfile[]
+  tenancies           Tenancy[]
+  maintenanceRequests MaintenanceRequest[]
+  staff               Staff[]
+  expenses            Expense[]
+  reports             AnonymousReport[]
+}
+
+model Unit {
+  id          String     @id @default(cuid())
+  property_id String
+  name        String
+  type        UnitType
+  rent_amount Decimal    @db.Decimal(10, 2)
+  status      UnitStatus @default(available)
+  description String?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  property            Property             @relation(fields: [property_id], references: [id])
+  tenancies           Tenancy[]
+  maintenanceRequests MaintenanceRequest[]
+  expenses            Expense[]
+
+  @@unique([name, property_id])
+}
+
+model PropertyVerification {
+  id                  String             @id @default(cuid())
+  property_id         String
+  verified_by         String?
+  submitted_by        String
+  id_document         String
+  supporting_document String?
+  verification_status VerificationStatus @default(pending)
+  rejection_reason    String?
+  verified_at         DateTime?
+  created_at          DateTime           @default(now())
+  updated_at          DateTime           @updatedAt
+
+  property    Property @relation(fields: [property_id], references: [id])
+  verifiedBy  User?    @relation("VerifiedByUser", fields: [verified_by], references: [id])
+  submittedBy User     @relation("SubmittedByUser", fields: [submitted_by], references: [id])
+}
+
+model PropertyInvite {
+  id           String       @id @default(cuid())
+  property_id  String
+  phone_number String?
+  role         InviteRole
+  invited_by   String
+  token        String
+  status       InviteStatus @default(pending)
+  expires_at   DateTime
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+
+  property  Property @relation(fields: [property_id], references: [id])
+  invitedBy User     @relation("InvitesSent", fields: [invited_by], references: [id])
+}
+
+model PropertyMembership {
+  id          String         @id @default(cuid())
+  property_id String
+  user_id     String
+  role        MembershipRole
+  start_date  DateTime
+  end_date    DateTime?
+  is_active   Boolean
+  created_at  DateTime       @default(now())
+
+  property Property @relation(fields: [property_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, property_id])
+}
+
+model PropertyUserProfile {
+  id                      String   @id @default(cuid())
+  property_id             String
+  user_id                 String
+  phone_number            String
+  emergency_contact_name  String?
+  emergency_contact_phone String?
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  property Property @relation(fields: [property_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, property_id])
+}
+
+model Tenancy {
+  id                 String           @id @default(cuid())
+  property_id        String
+  unit_id            String
+  tenant_id          String
+  landlord_id        String
+  start_date         DateTime
+  end_date           DateTime?
+  duration_in_months Int
+  rent_amount        Decimal          @db.Decimal(10, 2)
+  payment_frequency  PaymentFrequency @default(monthly)
+  security_deposit   Decimal          @default(0.00) @db.Decimal(10, 2)
+  status             TenancyStatus    @default(pending)
+  notes              String?
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+
+  property           Property             @relation(fields: [property_id], references: [id])
+  unit               Unit                 @relation(fields: [unit_id], references: [id])
+  tenant             User                 @relation("TenantTenancies", fields: [tenant_id], references: [id])
+  landlord           User                 @relation("LandlordTenancies", fields: [landlord_id], references: [id])
+  invoices           TenancyInvoice[]
+  MaintenanceRequest MaintenanceRequest[]
+}
+
+model TenancyInvoice {
+  id             String        @id @default(cuid())
+  tenancy_id     String
+  invoice_type   InvoiceType   @default(rent)
+  invoice_number String        @unique
+  amount         Decimal       @db.Decimal(10, 2)
+  due_date       DateTime
+  status         InvoiceStatus @default(pending)
+  notes          String?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  tenancy      Tenancy       @relation(fields: [tenancy_id], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id               String        @id @default(cuid())
+  invoice_id       String
+  paid_by_user_id  String?
+  paid_by_name     String?
+  amount           Decimal       @db.Decimal(10, 2)
+  payment_method   PaymentMethod
+  transaction_ref  String?
+  transaction_date DateTime
+  recorded_by      String
+  notes            String?
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  invoice    TenancyInvoice @relation(fields: [invoice_id], references: [id])
+  recordedBy User           @relation("TransactionRecorder", fields: [recorded_by], references: [id])
+}
+
+model MaintenanceRequest {
+  id            String              @id @default(cuid())
+  property_id   String
+  unit_id       String?
+  tenancy_id    String?
+  requested_by  String
+  title         String
+  description   String
+  priority      MaintenancePriority @default(medium)
+  status        MaintenanceStatus   @default(pending)
+  request_date  DateTime
+  resolved_date DateTime?
+  created_at    DateTime            @default(now())
+  updated_at    DateTime            @updatedAt
+
+  property    Property                @relation(fields: [property_id], references: [id])
+  unit        Unit?                   @relation(fields: [unit_id], references: [id])
+  tenancy     Tenancy?                @relation(fields: [tenancy_id], references: [id])
+  requester   User                    @relation(fields: [requested_by], references: [id])
+  assignments MaintenanceAssignment[]
+  Expense     Expense[]
+}
+
+model MaintenanceAssignment {
+  id                     String           @id @default(cuid())
+  maintenance_request_id String
+  staff_id               String?
+  assigned_by            String
+  assigned_at            DateTime
+  status                 AssignmentStatus @default(pending)
+  notes                  String?
+
+  request    MaintenanceRequest @relation(fields: [maintenance_request_id], references: [id])
+  staff      Staff?             @relation(fields: [staff_id], references: [id])
+  assignedBy User               @relation("AssignedBy", fields: [assigned_by], references: [id])
+}
+
+model Staff {
+  id                  String              @id @default(cuid())
+  user_id             String?
+  property_id         String
+  full_name           String
+  phone_number        String
+  specialization      StaffSpecialization
+  availability_status AvailabilityStatus  @default(available)
+  notes               String?
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+
+  user        User?                   @relation(fields: [user_id], references: [id])
+  property    Property                @relation(fields: [property_id], references: [id])
+  assignments MaintenanceAssignment[]
+}
+
+model Expense {
+  id                     String               @id @default(cuid())
+  property_id            String
+  unit_id                String?
+  maintenance_request_id String?
+  recorded_by            String
+  category               ExpenseCategory
+  description            String
+  amount                 Decimal              @db.Decimal(12, 2)
+  date_incurred          DateTime
+  payment_method         ExpensePaymentMethod
+  paid_to                String
+  attachment             String?
+  notes                  String?
+  created_at             DateTime             @default(now())
+  updated_at             DateTime             @updatedAt
+
+  property           Property            @relation(fields: [property_id], references: [id])
+  unit               Unit?               @relation(fields: [unit_id], references: [id])
+  maintenanceRequest MaintenanceRequest? @relation(fields: [maintenance_request_id], references: [id])
+  recordedBy         User                @relation(fields: [recorded_by], references: [id])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  user_id     String
+  action      String
+  entity_type String
+  entity_id   String
+  description String
+  created_at  DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model AnonymousReport {
+  id          String         @id @default(cuid())
+  property_id String?
+  category    ReportCategory @default(other)
+  description String
+  attachment  String?
+  reported_at DateTime
+  status      ReportStatus   @default(new)
+  reviewed_by String?
+  notes       String?
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+
+  property   Property? @relation(fields: [property_id], references: [id])
+  reviewedBy User?     @relation("ReportsReviewed", fields: [reviewed_by], references: [id])
+}
