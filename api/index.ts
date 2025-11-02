@@ -1,6 +1,6 @@
-import app from "./src/server.js";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import app from "./src/server.ts";
+import type { IncomingMessage, ServerResponse } from "http";
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  app(req, res); // Express apps are functions: (req, res)
-}
+export default (req: IncomingMessage, res: ServerResponse) => {
+  app(req, res);
+};
