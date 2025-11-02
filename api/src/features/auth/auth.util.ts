@@ -1,5 +1,5 @@
 import { addMinutes, differenceInMinutes } from "date-fns";
-import { prisma } from "../../../utils/db.js";
+import { prisma } from "../../utils/db.js";
 
 // import { prisma } from "../../../utils/db.js";
 // import { addMinutes } from "date-fns";

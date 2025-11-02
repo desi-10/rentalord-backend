@@ -1,11 +1,11 @@
 import express from "express";
-import * as inviteController from "../controllers/invite.controller.js";
+import * as inviteController from "./invite.controller.js";
 import {
   authenticate,
   authorizeAdmin,
-} from "../../../middlewares/auth.middleware.js";
-import { validateSchema } from "../../../middlewares/validate.middleware.js";
-import { createInviteSchema } from "../validators/invites.validator.js";
+} from "../../middlewares/auth.middleware.js";
+import { validateSchema } from "../../middlewares/validate.middleware.js";
+import { createInviteSchema } from "./invites.validator.js";
 
 const router = express.Router();
 

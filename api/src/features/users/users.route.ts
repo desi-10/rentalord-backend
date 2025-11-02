@@ -1,17 +1,17 @@
 // src/features/users/routes/user.routes.ts
 import express from "express";
-import * as userController from "../controllers/users.controller.js";
+import * as userController from "./users.controller.js";
 import {
   authenticate,
   authorizeAdmin,
-} from "../../../middlewares/auth.middleware.js";
-import { validateSchema } from "../../../middlewares/validate.middleware.js";
+} from "../../middlewares/auth.middleware.js";
+import { validateSchema } from "../../middlewares/validate.middleware.js";
 import {
   createUserSchema,
   updateUserSchema,
   userParamsSchema,
-} from "../validators/user.validator.js";
-import { validateParams } from "../../../middlewares/params.middleware.js";
+} from "./users.validator.js";
+import { validateParams } from "../../middlewares/params.middleware.js";
 // optional
 
 const router = express.Router();

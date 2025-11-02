@@ -1,7 +1,7 @@
 // src/features/users/controllers/user.controller.ts
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import * as userService from "../services/users.services.js";
+import * as userService from "./users.services.js";
 
 export const createUser = async (req: Request, res: Response) => {
   const result = await userService.createUser(req.body);

@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
-import { ApiError } from "../../../utils/api-error.js";
-import { apiResponse } from "../../../utils/api-response.js";
-import { prisma } from "../../../utils/db.js";
-import { TypeUser, TypeUserUpdate } from "../validators/user.validator.js";
-import { hashed } from "../../../utils/hash.js";
-import { getUserByIdUtil, getUserByPhoneNumber } from "../utils/users.utils.js";
+import { ApiError } from "../../utils/api-error.js";
+import { apiResponse } from "../../utils/api-response.js";
+import { prisma } from "../../utils/db.js";
+import { TypeUser, TypeUserUpdate } from "./users.validator.js";
+import { hashed } from "../../utils/hash.js";
+import { getUserByIdUtil, getUserByPhoneNumber } from "./users.utils.js";
 
 export const createUser = async (data: TypeUser) => {
   const existingUser = await getUserByPhoneNumber(data.phone_number);

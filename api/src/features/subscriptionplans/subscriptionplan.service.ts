@@ -1,12 +1,12 @@
 // src/services/subscription.service.ts
 import { StatusCodes } from "http-status-codes";
-import { ApiError } from "../../../utils/api-error.js";
-import { apiResponse } from "../../../utils/api-response.js";
-import { prisma } from "../../../utils/db.js";
+import { ApiError } from "../../utils/api-error.js";
+import { apiResponse } from "../../utils/api-response.js";
+import { prisma } from "../../utils/db.js";
 import {
   TypeCreateSubscriptionPlan,
   TypeUpdateSubscriptionPlan,
-} from "../validators/subscriptionplan.validator.js";
+} from "./subscriptionplan.validator.js";
 
 /**
  * Create a new subscription plan

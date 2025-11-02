@@ -1,4 +1,4 @@
-import { prisma } from "../../../utils/db.js";
+import { prisma } from "../../utils/db.js";
 
 export async function getUserByPhoneNumber(phoneNumber: string) {
   const user = prisma.user.findUnique({ where: { phone_number: phoneNumber } });

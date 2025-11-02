@@ -1,12 +1,12 @@
 import express from "express";
-import * as authController from "../controllers/auth.controller.js";
-import { validateSchema } from "../../../middlewares/validate.middleware.js";
+import * as authController from "./auth.controller.js";
+import { validateSchema } from "../../middlewares/validate.middleware.js";
 import {
   generateOtpSchema,
   registerSchema,
   resetPasswordSchema,
-} from "../validators/auth.validator.js";
-import { authenticate } from "../../../middlewares/auth.middleware.js";
+} from "./auth.validator.js";
+import { authenticate } from "../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 

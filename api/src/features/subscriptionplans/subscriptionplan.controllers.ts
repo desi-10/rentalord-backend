@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import * as subscriptionService from "../services/subscriptionplan.service.js";
-import { ApiError } from "../../../utils/api-error.js";
+import * as subscriptionService from "./subscriptionplan.service.js";
 
 export const createSubscriptionPlan = async (req: Request, res: Response) => {
   const result = await subscriptionService.createSubscriptionPlanService(

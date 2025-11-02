@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import * as subscriptionService from "../services/subscription.services.js";
+import * as subscriptionService from "./subscription.services.js";
 
 export const createUserSubscription = async (req: Request, res: Response) => {
   const userId = req.userId as string;

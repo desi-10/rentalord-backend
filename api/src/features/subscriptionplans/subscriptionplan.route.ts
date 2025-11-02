@@ -1,14 +1,14 @@
 import express from "express";
-import * as subscriptionPlanController from "../controllers/subscriptionplan.controllers.js";
+import * as subscriptionPlanController from "./subscriptionplan.controllers.js";
 import {
   createSubscriptionPlanSchema,
   updateSubscritionPlanSchema,
-} from "../validators/subscriptionplan.validator.js";
-import { validateSchema } from "../../../middlewares/validate.middleware.js";
+} from "./subscriptionplan.validator.js";
+import { validateSchema } from "../../middlewares/validate.middleware.js";
 import {
   authenticate,
   authorizeAdmin,
-} from "../../../middlewares/auth.middleware.js";
+} from "../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 

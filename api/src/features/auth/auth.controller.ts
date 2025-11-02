@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import * as authService from "../services/auth.service.js";
+import * as authService from "./auth.service.js";
+import { StatusCodes } from "http-status-codes";
 
 export const generateOTPController = async (req: Request, res: Response) => {
   const result = await authService.generateOtpService(req.body);
-  return res.json(result);
+  return res.status(StatusCodes.OK).json(result);
 };
 
 export const verifyOTPController = async (req: Request, res: Response) => {

@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
-import { ApiError } from "../../../utils/api-error.js";
-import { apiResponse } from "../../../utils/api-response.js";
-import { prisma } from "../../../utils/db.js";
-import { generateCode } from "../../../utils/generate-code.js";
-import { generateToken } from "../../../utils/jwt.js";
-import { hashed, compareHashed } from "../../../utils/hash.js";
+import { ApiError } from "../../utils/api-error.js";
+import { apiResponse } from "../../utils/api-response.js";
+import { prisma } from "../../utils/db.js";
+import { generateCode } from "../../utils/generate-code.js";
+import { generateToken } from "../../utils/jwt.js";
+import { hashed, compareHashed } from "../../utils/hash.js";
 import {
   TypeRegister,
   TypeVerifyOtp,
@@ -12,7 +12,7 @@ import {
   TypeGenerateOTP,
   TypeResetPassword,
   TypeUpdatePassword,
-} from "../validators/auth.validator.js";
+} from "./auth.validator.js";
 import {
   generateOtpForLogin,
   getOtpAttempts,
@@ -21,11 +21,8 @@ import {
   recordFailedAttempt,
   resetLoginAttempts,
   resetOtpAttempts,
-} from "../utils/auth.util.js";
-import {
-  getUserByIdUtil,
-  getUserByPhoneNumber,
-} from "../../users/utils/users.utils.js";
+} from "./auth.util.js";
+import { getUserByIdUtil, getUserByPhoneNumber } from "../users/users.utils.js";
 
 export const generateOtpService = async (data: TypeGenerateOTP) => {
   const { phone_number, purpose } = data;

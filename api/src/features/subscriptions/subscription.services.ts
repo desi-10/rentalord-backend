@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import { ApiError } from "../../../utils/api-error.js";
-import { apiResponse } from "../../../utils/api-response.js";
-import { prisma } from "../../../utils/db.js";
-import { TypeCreateSubscription } from "../validators/subscription.validator.js";
+import { ApiError } from "../../utils/api-error.js";
+import { apiResponse } from "../../utils/api-response.js";
+import { prisma } from "../../utils/db.js";
+import { TypeCreateSubscription } from "./subscription.validator.js";
 
 export const createSubscriptionService = async (
   userId: string,

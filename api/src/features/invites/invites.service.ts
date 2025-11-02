@@ -2,7 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import crypto from "crypto";
 import { prisma } from "../../utils/db.js";
 import { ApiError } from "../../utils/api-error.js";
-import { generateCode } from "../../utils/generate-code.js";
 import { apiResponse } from "../../utils/api-response.js";
 import {
   TypeAcceptInvite,
@@ -43,7 +42,7 @@ export const createInviteService = async (
   }
 
   // 3️⃣ Generate invite token
-  const token = generateCode();
+  const token = crypto.randomBytes(32).toString("hex");
 
   // 4️⃣ Set expiry (e.g., 3 days from now)
   const expiresAt = new Date();
