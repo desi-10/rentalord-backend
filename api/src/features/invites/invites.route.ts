@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/accept", inviteController.acceptInviteController);
 
 router
-  .route("/admin")
+  .route("/")
   .get(authenticate, authorizeAdmin, inviteController.getInvitesController)
   .post(
     authenticate,
@@ -22,7 +22,7 @@ router
   );
 
 router
-  .route("/:id/admin")
+  .route("/:id")
   .get(authenticate, authorizeAdmin, inviteController.getInviteController)
   .patch(authenticate, authorizeAdmin, inviteController.updateInviteController)
   .delete(
