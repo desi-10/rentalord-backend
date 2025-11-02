@@ -1,9 +1,9 @@
 import express from "express";
-import usersRoutes from "../features/users/routes/users.route.js";
-import authRoutes from "../features/auth/routes/auth.route.js";
-import subscriptionRoutes from "../features/subscriptions/routes/subscription.route.js";
-import subscriptionplanRoutes from "../features/subscriptionplans/routes/subscriptionplan.route.js";
-import invitesRoutes from "../features/invites/routes/invites.route.js";
+import usersRoutes from "../features/users/users.route.js";
+import authRoutes from "../features/auth/auth.route.js";
+import subscriptionRoutes from "../features/subscriptions/subscription.route.js";
+import subscriptionplanRoutes from "../features/subscriptionplans/subscriptionplan.route.js";
+import invitesRoutes from "../features/invites/invites.route.js";
 
 const router = express.Router();
 
