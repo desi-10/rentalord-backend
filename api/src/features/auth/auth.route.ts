@@ -11,7 +11,7 @@ import { authenticate } from "../../middlewares/auth.middleware.js";
 const router = express.Router();
 
 router.post(
-  "/generate",
+  "/generate-otp",
   validateSchema(generateOtpSchema),
   authController.generateOTPController
 );
@@ -26,7 +26,14 @@ router.post(
 router.post("/login", authController.loginController);
 
 router.post(
-  "/reset-password",
+  "/update-password",
+  authenticate,
+  validateSchema(resetPasswordSchema),
+  authController.resetPasswordController
+);
+
+router.post(
+  "/forgot-password",
   authenticate,
   validateSchema(resetPasswordSchema),
   authController.resetPasswordController

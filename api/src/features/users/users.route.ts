@@ -26,7 +26,7 @@ router.patch(
 
 // admin routes
 router
-  .route("/admin")
+  .route("/")
   .get(authenticate, authorizeAdmin, userController.getAllUsers)
   .post(
     authenticate,
