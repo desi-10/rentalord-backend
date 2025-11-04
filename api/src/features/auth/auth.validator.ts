@@ -13,18 +13,18 @@ export const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   first_name: z.string(),
   last_name: z.string(),
-  otp: z.string().length(4, "OTP must be 4 digits"),
+  otp: z.string().length(6, "OTP must be 6 digits"),
 });
 
 export const loginSchema = z.object({
   phone_number: z.string(),
   password: z.string(),
-  otp: z.string().length(4).optional(),
+  otp: z.string().length(6, "OTP must be 6 digits").optional(),
 });
 
 export const verifyOtpSchema = z.object({
   phone_number: z.string(),
-  otp: z.string().length(4),
+  otp: z.string().length(6),
 });
 
 export const resetPasswordSchema = z.object({
@@ -35,7 +35,7 @@ export const updatePasswordSchema = z
   .object({
     new_password: z.string().min(6, "Password must be at least 6 characters"),
     confirm_password: z.string(),
-    otp: z.string().length(4, "OTP must be 4 digits"),
+    otp: z.string().length(6, "OTP must be 6 digits"),
   })
   .refine((data) => data.new_password === data.confirm_password, {
     message: "Passwords do not match",

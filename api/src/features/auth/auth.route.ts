@@ -16,7 +16,8 @@ router.post(
   authController.generateOTPController
 );
 
-router.post("/verify", authController.verifyOTPController);
+// router.post("/verify", authController.verifyOTPController);
+router.post("/refresh", authController.refreshTokenController);
 
 router.post(
   "/register",

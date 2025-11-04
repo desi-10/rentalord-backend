@@ -1,9 +1,10 @@
+import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../../utils/api-error.js";
 import { apiResponse } from "../../utils/api-response.js";
 import { prisma } from "../../utils/db.js";
 import { generateCode } from "../../utils/generate-code.js";
-import { generateToken } from "../../utils/jwt.js";
+import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt.js";
 import { hashed, compareHashed } from "../../utils/hash.js";
 import {
   TypeRegister,
@@ -88,44 +89,61 @@ export const registerService = async (data: TypeRegister) => {
   // Remove OTP after successful registration
   await prisma.oTP.delete({ where: { phone_number } });
 
-  const token = generateToken(user.id);
+  // const token = generateToken(user.id);
   const { password: _, ...userData } = user;
 
   return apiResponse("Registration successful", {
     user: userData,
-    token,
   });
 };
 
-export const verifyRegistrationOtpService = async (data: TypeVerifyOtp) => {
-  const { phone_number, otp } = data;
+// export const verifyRegistrationOtpService = async (data: TypeVerifyOtp) => {
+//   const { phone_number, otp } = data;
 
-  const record = await prisma.oTP.findUnique({
-    where: { phone_number },
-    include: { user: true },
-  });
+//   const record = await prisma.oTP.findUnique({
+//     where: { phone_number },
+//     include: { user: true },
+//   });
 
-  if (!record) throw new ApiError("OTP not found", StatusCodes.NOT_FOUND);
-  if (record.code !== otp)
-    throw new ApiError("Invalid OTP", StatusCodes.UNAUTHORIZED);
-  if (record.expiresAt < new Date())
-    throw new ApiError("OTP expired", StatusCodes.BAD_REQUEST);
-  if (!record.user)
-    throw new ApiError("No user linked to this OTP", StatusCodes.BAD_REQUEST);
+//   if (!record) throw new ApiError("OTP not found", StatusCodes.NOT_FOUND);
+//   if (record.code !== otp)
+//     throw new ApiError("Invalid OTP", StatusCodes.UNAUTHORIZED);
+//   if (record.expiresAt < new Date())
+//     throw new ApiError("OTP expired", StatusCodes.BAD_REQUEST);
+//   if (!record.user)
+//     throw new ApiError("No user linked to this OTP", StatusCodes.BAD_REQUEST);
 
-  await prisma.user.update({
-    where: { id: record.user.id },
-    data: { is_verified: true },
-  });
+//   await prisma.user.update({
+//     where: { id: record.user.id },
+//     data: { is_verified: true },
+//   });
 
-  await prisma.oTP.delete({ where: { phone_number } });
+//   await prisma.oTP.delete({ where: { phone_number } });
 
-  const token = generateToken(record.user.id);
-  const { password, ...userData } = record.user;
+//   const token = generateToken(record.user.id);
+//   const { password, ...userData } = record.user;
 
-  return apiResponse("Phone number verified successfully", {
-    user: userData,
-    token,
+//   return apiResponse("Phone number verified successfully", {
+//     user: userData,
+//     token,
+//   });
+// };
+
+export const refreshToken = (req: Request) => {
+  const refreshToken = req.cookies?.refresh_token;
+
+  if (!refreshToken) {
+    throw new ApiError("No refresh token provided", StatusCodes.UNAUTHORIZED);
+  }
+
+  // Verify refresh token
+  const decoded = verifyRefreshToken(refreshToken);
+
+  // Generate new access token
+  const newAccessToken = generateAccessToken(decoded.id);
+
+  return apiResponse("Token refreshed successfully", {
+    token: newAccessToken,
   });
 };
 
@@ -176,7 +194,7 @@ export const loginService = async (data: TypeLogin) => {
       const generatedOtp = await generateOtpForLogin(user.phone_number);
       await resetOtpAttempts(phone_number);
       return apiResponse("OTP sent. Please verify to complete login.", {
-        requires2FA: true,
+        requires_2fa: true,
         otp_sent: true,
         generatedOtp,
       });
@@ -224,7 +242,8 @@ export const loginService = async (data: TypeLogin) => {
   await resetOtpAttempts(phone_number);
 
   // 6️⃣ Generate JWT
-  const token = generateToken(user.id);
+  const token = generateAccessToken(user.id);
+
   const { password: _, ...userData } = user;
 
   return apiResponse("Login successful", { user: userData, token });
@@ -256,8 +275,8 @@ export const resetPasswordService = async (
   if (!ok)
     throw new ApiError("Invalid credentials", StatusCodes.UNPROCESSABLE_ENTITY);
 
-  // Generate OTP (4-digit code)
-  const code = generateCode(4);
+  // Generate OTP (6-digit code)
+  const code = generateCode();
 
   // Store OTP (create or update)
   await prisma.oTP.upsert({

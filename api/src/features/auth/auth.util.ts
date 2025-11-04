@@ -1,3 +1,4 @@
+import { Response } from "express";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { prisma } from "../../utils/db.js";
 
@@ -182,4 +183,14 @@ export const generateOtpForLogin = async (phone_number: string) => {
   // await sendOtpMessage(phone_number, code);
 
   return code;
+};
+
+export const setRefreshToken = (res: Response, refreshToken: string) => {
+  res.cookie("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+  });
 };

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/db.js";
-import { verifyToken } from "../utils/jwt.js";
+import { verifyAccessToken } from "../utils/jwt.js";
 import { ApiError } from "../utils/api-error.js";
 import { StatusCodes } from "http-status-codes";
 import { AccessRole } from "@prisma/client";
@@ -17,7 +17,7 @@ export async function authenticate(
 
   const token = authHeader.split(" ")[1];
   try {
-    const payload = verifyToken(token);
+    const payload = verifyAccessToken(token);
 
     console.log(payload, "token");
 
