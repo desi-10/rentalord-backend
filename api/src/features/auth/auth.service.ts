@@ -354,8 +354,6 @@ export const twoFa = async (userId: string, data: TypeOTP) => {
   if (!existingUser)
     throw new ApiError("User not found", StatusCodes.NOT_FOUND);
 
-  console.log(userId, "user details");
-
   await prisma.user.update({
     where: { id: userId },
     data: {
