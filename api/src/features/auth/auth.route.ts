@@ -5,6 +5,7 @@ import {
   generateOtpSchema,
   registerSchema,
   resetPasswordSchema,
+  twofaSchema,
 } from "./auth.validator.js";
 import { authenticate } from "../../middlewares/auth.middleware.js";
 
@@ -18,6 +19,13 @@ router.post(
 
 // router.post("/verify", authController.verifyOTPController);
 router.post("/refresh", authController.refreshTokenController);
+
+router.post(
+  "/twoFa",
+  authenticate,
+  validateSchema(twofaSchema),
+  authController.twoFaController
+);
 
 router.post(
   "/register",

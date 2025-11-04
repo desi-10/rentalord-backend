@@ -56,28 +56,28 @@ export async function recordFailedAttempt(phone_number: string) {
       data: {
         phone_number,
         attempts: 1,
-        lastAttempt: now,
-        lockCount: 0,
-        lockedUntil: null,
+        last_attempt: now,
+        lock_count: 0,
+        locked_until: null,
       },
     });
     return;
   }
 
-  let { attempts, lockCount, lockedUntil, lastAttempt } = existing;
+  let { attempts, lock_count, locked_until, last_attempt } = existing;
 
   // 🔹 Step 1: Check if user’s cooldown time has passed (decay logic)
-  if (lastAttempt) {
-    const minsSinceLast = differenceInMinutes(now, lastAttempt);
-    if (minsSinceLast > DECAY_AFTER_MINUTES && lockCount > 0) {
-      lockCount = Math.max(0, lockCount - 1);
+  if (last_attempt) {
+    const minsSinceLast = differenceInMinutes(now, last_attempt);
+    if (minsSinceLast > DECAY_AFTER_MINUTES && lock_count > 0) {
+      lock_count = Math.max(0, lock_count - 1);
     }
   }
 
   // 🔹 Step 2: If still locked, ignore or re-lock longer if abuse continues
-  if (lockedUntil && lockedUntil > now) {
+  if (locked_until && locked_until > now) {
     const remaining = Math.ceil(
-      (lockedUntil.getTime() - now.getTime()) / 60000
+      (locked_until.getTime() - now.getTime()) / 60000
     );
 
     throw new Error(`Account is locked. Try again in ${remaining} minute(s).`);
@@ -85,18 +85,18 @@ export async function recordFailedAttempt(phone_number: string) {
 
   // 🔹 Step 3: Add a new failed attempt
   let newAttempts = attempts + 1;
-  let updateData: any = { attempts: newAttempts, lastAttempt: now, lockCount };
+  let updateData: any = { attempts: newAttempts, lastAttempt: now, lock_count };
 
   // 🔹 Step 4: Handle first lock
-  if (newAttempts >= MAX_ATTEMPTS && lockCount === 0) {
+  if (newAttempts >= MAX_ATTEMPTS && lock_count === 0) {
     updateData.lockCount = 1;
     updateData.lockedUntil = addMinutes(now, BASE_LOCK_MINUTES);
     updateData.attempts = 0;
   }
 
   // 🔹 Step 5: If user was previously locked and keeps failing, escalate
-  else if (lockCount > 0 && newAttempts >= EXTRA_ATTEMPTS_BEFORE_ESCALATE) {
-    const newLockCount = lockCount + 1;
+  else if (lock_count > 0 && newAttempts >= EXTRA_ATTEMPTS_BEFORE_ESCALATE) {
+    const newLockCount = lock_count + 1;
     const newLockTime = BASE_LOCK_MINUTES * Math.pow(2, newLockCount - 1);
 
     updateData.lockCount = newLockCount;
@@ -114,7 +114,7 @@ export async function recordFailedAttempt(phone_number: string) {
 export async function resetLoginAttempts(phone_number: string) {
   await prisma.loginAttempt.updateMany({
     where: { phone_number },
-    data: { attempts: 0, lockedUntil: null, lockCount: 0 },
+    data: { attempts: 0, locked_until: null, lock_count: 0 },
   });
 }
 
@@ -124,7 +124,7 @@ export async function isAccountLocked(phone_number: string) {
   });
   if (!record) return false;
 
-  if (record.lockedUntil && record.lockedUntil > new Date()) {
+  if (record.locked_until && record.locked_until > new Date()) {
     return true;
   }
 
@@ -139,7 +139,7 @@ export const incrementOtpAttempts = async (phone_number: string) => {
       phone_number,
       code: "000000", // placeholder
       purpose: "login",
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      expires_at: new Date(Date.now() + 5 * 60 * 1000),
       attempts: 1,
     },
   });
@@ -168,14 +168,14 @@ export const generateOtpForLogin = async (phone_number: string) => {
     update: {
       code,
       purpose: "login",
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min expiry
+      expires_at: new Date(Date.now() + 5 * 60 * 1000), // 5 min expiry
       attempts: 0,
     },
     create: {
       phone_number,
       code,
       purpose: "login",
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      expires_at: new Date(Date.now() + 5 * 60 * 1000),
     },
   });
 

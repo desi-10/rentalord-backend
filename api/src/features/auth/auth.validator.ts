@@ -42,9 +42,16 @@ export const updatePasswordSchema = z
     path: ["confirm_password"],
   });
 
+export const twofaSchema = z.object({
+  phone_number: z.string(),
+  otp: z.string().length(6, "OTP is 6 digits"),
+  action: z.enum(["on", "off"]).default("on"),
+});
+
 export type TypeRegister = z.infer<typeof registerSchema>;
 export type TypeLogin = z.infer<typeof loginSchema>;
 export type TypeVerifyOtp = z.infer<typeof verifyOtpSchema>;
 export type TypeGenerateOTP = z.infer<typeof generateOtpSchema>;
 export type TypeResetPassword = z.infer<typeof resetPasswordSchema>;
 export type TypeUpdatePassword = z.infer<typeof updatePasswordSchema>;
+export type TypeOTP = z.infer<typeof twofaSchema>;

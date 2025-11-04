@@ -4,6 +4,7 @@ import { verifyAccessToken } from "../utils/jwt.js";
 import { ApiError } from "../utils/api-error.js";
 import { StatusCodes } from "http-status-codes";
 import { AccessRole } from "@prisma/client";
+import { getUserByIdUtil } from "../features/users/users.utils.js";
 
 export async function authenticate(
   req: Request,
@@ -21,9 +22,7 @@ export async function authenticate(
 
     console.log(payload, "token");
 
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-    });
+    const user = await getUserByIdUtil(payload.id);
     if (!user) throw new ApiError("Invalid token", StatusCodes.UNAUTHORIZED);
 
     // attach to request for downstream handlers

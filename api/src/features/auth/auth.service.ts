@@ -8,11 +8,11 @@ import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt.js";
 import { hashed, compareHashed } from "../../utils/hash.js";
 import {
   TypeRegister,
-  TypeVerifyOtp,
   TypeLogin,
   TypeGenerateOTP,
   TypeResetPassword,
   TypeUpdatePassword,
+  TypeOTP,
 } from "./auth.validator.js";
 import {
   generateOtpForLogin,
@@ -36,18 +36,18 @@ export const generateOtpService = async (data: TypeGenerateOTP) => {
   if (purpose === "login" && !existingUser)
     throw new ApiError("User not found", StatusCodes.NOT_FOUND);
 
-  const otp = generateCode(4);
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const otp = generateCode();
+  const expires_at = new Date(Date.now() + 5 * 60 * 1000);
 
   await prisma.oTP.upsert({
     where: { phone_number },
-    update: { code: otp, expiresAt, purpose },
+    update: { code: otp, expires_at, purpose },
     create: {
       phone_number,
       code: otp,
       purpose,
-      expiresAt,
-      userId: existingUser?.id || null,
+      expires_at,
+      user_id: existingUser?.id || null,
     },
   });
 
@@ -66,7 +66,7 @@ export const registerService = async (data: TypeRegister) => {
     throw new ApiError("Invalid OTP purpose", StatusCodes.BAD_REQUEST);
   if (otpRecord.code !== otp)
     throw new ApiError("Invalid OTP code", StatusCodes.UNAUTHORIZED);
-  if (otpRecord.expiresAt < new Date())
+  if (otpRecord.expires_at < new Date())
     throw new ApiError("OTP expired", StatusCodes.BAD_REQUEST);
 
   // Ensure user does not already exist
@@ -187,7 +187,7 @@ export const loginService = async (data: TypeLogin) => {
   }
 
   // 4️⃣ Handle 2FA
-  if (user.isTwoFactorEnabled) {
+  if (user.is_two_factor_enabled) {
     // If password is valid but OTP not provided yet → prompt OTP
     if (passwordValid && !otp) {
       // Generate and send OTP (SMS or email, depending on your setup)
@@ -210,7 +210,7 @@ export const loginService = async (data: TypeLogin) => {
         otpRecord &&
         otpRecord.code === otp &&
         otpRecord.purpose === "login" &&
-        otpRecord.expiresAt > new Date()
+        otpRecord.expires_at > new Date()
       ) {
         await prisma.oTP.delete({ where: { phone_number } });
         await resetOtpAttempts(phone_number);
@@ -251,12 +251,12 @@ export const loginService = async (data: TypeLogin) => {
 
 export const resendOtpService = async (phone_number: string) => {
   const otp = generateCode(4);
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const expires_at = new Date(Date.now() + 5 * 60 * 1000);
 
   await prisma.oTP.upsert({
     where: { phone_number },
-    update: { code: otp, expiresAt },
-    create: { phone_number, code: otp, purpose: "register", expiresAt },
+    update: { code: otp, expires_at },
+    create: { phone_number, code: otp, purpose: "register", expires_at },
   });
 
   // await sendSms(phone_number, `Your new OTP code is ${otp}`);
@@ -284,13 +284,13 @@ export const resetPasswordService = async (
     update: {
       code,
       purpose: "reset_password",
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min expiry
+      expires_at: new Date(Date.now() + 5 * 60 * 1000), // 5 min expiry
     },
     create: {
       phone_number: user.phone_number,
       code,
       purpose: "reset_password",
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      expires_at: new Date(Date.now() + 5 * 60 * 1000),
     },
   });
 
@@ -319,7 +319,7 @@ export const updatePasswordService = async (
   if (
     !otpRecord ||
     otpRecord.purpose !== "reset_password" ||
-    otpRecord.expiresAt < new Date() ||
+    otpRecord.expires_at < new Date() ||
     otpRecord.code !== otp
   ) {
     throw new ApiError("Invalid or expired OTP", StatusCodes.UNAUTHORIZED);
@@ -336,4 +336,32 @@ export const updatePasswordService = async (
   ]);
 
   return apiResponse("Password updated successfully");
+};
+
+export const twoFa = async (userId: string, data: TypeOTP) => {
+  const { phone_number, otp, action } = data;
+
+  const otpRecord = await prisma.oTP.findUnique({ where: { phone_number } });
+  if (!otpRecord) throw new ApiError("OTP not found", StatusCodes.NOT_FOUND);
+  if (otpRecord.purpose !== "2fa")
+    throw new ApiError("Invalid OTP purpose", StatusCodes.BAD_REQUEST);
+  if (otpRecord.code !== otp)
+    throw new ApiError("Invalid OTP code", StatusCodes.UNAUTHORIZED);
+  if (otpRecord.expires_at < new Date())
+    throw new ApiError("OTP expired", StatusCodes.BAD_REQUEST);
+
+  const existingUser = await getUserByIdUtil(userId);
+  if (!existingUser)
+    throw new ApiError("User not found", StatusCodes.NOT_FOUND);
+
+  console.log(userId, "user details");
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      is_two_factor_enabled: action === "on",
+    },
+  });
+
+  return apiResponse("2FA Updated successfully", null);
 };

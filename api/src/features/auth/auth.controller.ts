@@ -42,3 +42,9 @@ export const updatePasswordController = async (req: Request, res: Response) => {
   const result = await authService.updatePasswordService(userId, req.body);
   res.json(result);
 };
+
+export const twoFaController = async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const result = await authService.twoFa(userId, req.body);
+  res.json(result);
+};
