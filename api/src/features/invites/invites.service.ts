@@ -54,7 +54,7 @@ export const createInviteService = async (
       property_id,
       phone_number,
       role,
-      invited_by: inviterId,
+      invited_by_id: inviterId,
       token,
       status: "pending",
       expires_at: expiresAt,
@@ -72,7 +72,7 @@ export const getInvitesService = async () => {
   const invites = await prisma.propertyInvite.findMany({
     include: {
       property: { select: { id: true, name: true } },
-      invitedBy: { select: { id: true, first_name: true, last_name: true } },
+      invited_by: { select: { id: true, first_name: true, last_name: true } },
     },
     orderBy: { created_at: "desc" },
   });
@@ -83,7 +83,7 @@ export const getInvitesService = async () => {
 export const getInviteService = async (id: string) => {
   const invite = await prisma.propertyInvite.findUnique({
     where: { id },
-    include: { property: true, invitedBy: true },
+    include: { property: true, invited_by: true },
   });
 
   if (!invite) throw new ApiError("Invite not found", StatusCodes.NOT_FOUND);
@@ -109,7 +109,7 @@ export const updateInviteService = async (
       role: data.role || existingProperty.role,
       status: data.status || existingProperty.status,
     },
-    include: { property: true, invitedBy: true },
+    include: { property: true, invited_by: true },
   });
 
   return apiResponse("Invite updated succesfully", invite);
