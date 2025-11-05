@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { prisma } from "../../utils/db.js";
+import { LoginAttempt } from "@prisma/client";
 
 // import { prisma } from "../../../utils/db.js";
 // import { addMinutes } from "date-fns";
@@ -85,12 +86,16 @@ export async function recordFailedAttempt(phone_number: string) {
 
   // 🔹 Step 3: Add a new failed attempt
   let newAttempts = attempts + 1;
-  let updateData: any = { attempts: newAttempts, lastAttempt: now, lock_count };
+  let updateData: Partial<LoginAttempt> = {
+    attempts: newAttempts,
+    last_attempt: now,
+    lock_count,
+  };
 
   // 🔹 Step 4: Handle first lock
   if (newAttempts >= MAX_ATTEMPTS && lock_count === 0) {
-    updateData.lockCount = 1;
-    updateData.lockedUntil = addMinutes(now, BASE_LOCK_MINUTES);
+    updateData.lock_count = 1;
+    updateData.locked_until = addMinutes(now, BASE_LOCK_MINUTES);
     updateData.attempts = 0;
   }
 
@@ -99,8 +104,8 @@ export async function recordFailedAttempt(phone_number: string) {
     const newLockCount = lock_count + 1;
     const newLockTime = BASE_LOCK_MINUTES * Math.pow(2, newLockCount - 1);
 
-    updateData.lockCount = newLockCount;
-    updateData.lockedUntil = addMinutes(now, newLockTime);
+    updateData.lock_count = newLockCount;
+    updateData.locked_until = addMinutes(now, newLockTime);
     updateData.attempts = 0;
   }
 
