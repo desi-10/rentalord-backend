@@ -22,7 +22,5 @@ export const logger = pino({
 export const httpLogger = pinoHttp({
   logger,
   // quietReqLogger: true,
-  autoLogging: {
-    ignorePaths: ["/health", "/favicon.ico"], // optional
-  },
+  autoLogging: process.env.NODE_ENV !== "production",
 });
