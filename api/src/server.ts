@@ -2,13 +2,14 @@ import express from "express";
 import cors from "cors";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import routes from "../src/routes/index.js";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import { httpLogger } from "./utils/logger.js";
 
 const app = express();
 
+app.use(httpLogger);
+
 app.use(cors({ origin: "*" }));
-app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

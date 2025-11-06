@@ -238,6 +238,8 @@ model Organization {
   owner User @relation(fields: [owner_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  property Property[]
 }
 
 model OTP {
@@ -296,12 +298,14 @@ model Property {
   address             String
   description         String?
   created_by_id          String
+  organization_id       String
   number_of_units     Int                @default(0)
   is_public           Boolean            @default(false)
   verification_status VerificationStatus @default(not_required)
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt
 
+  organization          Organization  @relation(fields: [organization_id], references: [id])
   created_by            User                   @relation("UserProperties", fields: [created_by_id], references: [id])
   units                Unit[]
   verifications        PropertyVerification[]
