@@ -1,5 +1,6 @@
+// import { logger } from "./logger.js";
+import { Request } from "express";
 import { logger } from "./logger.js";
-
 interface ErrorContext {
   method?: string;
   path?: string;
@@ -9,6 +10,7 @@ interface ErrorContext {
 }
 
 export async function logError(
+  //   req: Request,
   error: Error,
   context: ErrorContext = {}
 ): Promise<void> {
@@ -30,7 +32,7 @@ export async function logError(
   };
 
   try {
-    await fetch(process.env.ERROR_WEBHOOK_URL, {
+    await fetch(process.env.ERROR_WEBHOOK_URL!, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -39,5 +41,6 @@ export async function logError(
     });
   } catch (notifyError) {
     logger.error({ err: notifyError }, "Failed to send error webhook");
+    // req.log.error({ err: notifyError }, "Failed to send error webhook");
   }
 }

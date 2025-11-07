@@ -5,6 +5,7 @@ import subscriptionRoutes from "../features/subscriptions/subscription.route.js"
 import subscriptionplanRoutes from "../features/subscription-plans/subscriptionplan.route.js";
 import invitesRoutes from "../features/invites/invites.route.js";
 import unitsRoutes from "../features/unit/unit.route.js";
+import organizationsRoutes from "../features/organization/organization.route.js";
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use("/users", usersRoutes);
 router.use("/subscriptions", subscriptionRoutes);
 router.use("/subscription-plans", subscriptionplanRoutes);
 router.use("/invites", invitesRoutes);
-router.use("/unit", unitsRoutes);
+router.use("/units", unitsRoutes);
+router.use("/organizations", organizationsRoutes);
 
 export default router;

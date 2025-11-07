@@ -76,6 +76,7 @@ export const getInvitesService = async () => {
     },
     orderBy: { created_at: "desc" },
   });
+
   return apiResponse("Invites fetched sucessfully", invites);
 };
 

@@ -20,8 +20,6 @@ export async function authenticate(
   try {
     const payload = verifyAccessToken(token);
 
-    console.log(payload, "token");
-
     const user = await getUserByIdUtil(payload.id);
     if (!user) throw new ApiError("Invalid token", StatusCodes.UNAUTHORIZED);
 

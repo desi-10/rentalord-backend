@@ -4,9 +4,11 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 import routes from "../src/routes/index.js";
 import cookieParser from "cookie-parser";
 import { httpLogger } from "./utils/logger.js";
+import { createRateLimiter } from "./utils/rate-limit.js";
 
 const app = express();
 
+app.use(createRateLimiter()); // ✅ apply before all routes
 app.use(httpLogger);
 
 app.use(cors({ origin: "*" }));

@@ -28,6 +28,13 @@ import { getUserByIdUtil, getUserByPhoneNumber } from "../users/users.utils.js";
 export const generateOtpService = async (data: TypeGenerateOTP) => {
   const { phone_number, purpose } = data;
 
+  if (await isAccountLocked(phone_number)) {
+    throw new ApiError(
+      "Too many failed attempts. Account temporarily locked. Try again later.",
+      StatusCodes.FORBIDDEN
+    );
+  }
+
   const existingUser = await getUserByPhoneNumber(phone_number);
 
   // Rules depending on purpose

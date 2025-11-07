@@ -240,6 +240,8 @@ model Organization {
   updated_at DateTime @updatedAt
 
   property Property[]
+
+  @@unique([owner_id, organization_name])
 }
 
 model OTP {
