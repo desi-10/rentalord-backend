@@ -64,24 +64,6 @@ export const getUserById = async (userId: string) => {
           business_name: true,
         },
       },
-      memberships: {
-        orderBy: {
-          created_at: "desc",
-        },
-        where: {
-          is_active: true,
-          role: MembershipRole.tenant,
-        },
-        select: {
-          id: true,
-          property: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
       properties: {
         orderBy: {
           created_at: "desc",
