@@ -32,8 +32,8 @@ export const getAllUsers = async () => {
     select: {
       id: true,
       first_name: true,
-      phone_number: true,
       last_name: true,
+      phone_number: true,
       email: true,
       created_at: true,
     },
@@ -55,6 +55,7 @@ export const getUserById = async (userId: string) => {
       id: true,
       first_name: true,
       last_name: true,
+      phone_number: true,
       email: true,
       properties: {
         select: {
