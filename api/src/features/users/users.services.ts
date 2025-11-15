@@ -64,26 +64,44 @@ export const getUserById = async (userId: string) => {
           business_name: true,
         },
       },
-      properties: {
+      memberships: {
         orderBy: {
           created_at: "desc",
         },
+        where: {
+          is_active: true,
+          role: MembershipRole.tenant,
+        },
         select: {
           id: true,
-          name: true,
-          address: true,
-          is_public: true,
-          staff: {
+          property: {
             select: {
-              _count: true,
               id: true,
-              full_name: true,
+              name: true,
             },
           },
-          number_of_units: true,
-          description: true,
         },
       },
+      // properties: {
+      //   orderBy: {
+      //     created_at: "desc",
+      //   },
+      //   select: {
+      //     id: true,
+      //     name: true,
+      //     address: true,
+      //     is_public: true,
+      //     staff: {
+      //       select: {
+      //         _count: true,
+      //         id: true,
+      //         full_name: true,
+      //       },
+      //     },
+      //     number_of_units: true,
+      //     description: true,
+      //   },
+      // },
     },
   });
 
