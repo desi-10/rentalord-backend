@@ -65,6 +65,9 @@ export const getUserById = async (userId: string) => {
         },
       },
       memberships: {
+        orderBy: {
+          created_at: "desc",
+        },
         where: {
           is_active: true,
           role: MembershipRole.tenant,
@@ -80,6 +83,9 @@ export const getUserById = async (userId: string) => {
         },
       },
       properties: {
+        orderBy: {
+          created_at: "desc",
+        },
         select: {
           id: true,
           name: true,
