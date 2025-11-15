@@ -204,7 +204,7 @@ model User {
 
   // Relations
   subscriptions           Subscription[]
-  properties              Property[]              @relation("UserProperties")
+  properties              Property[]              @relation("UserBusinesses")
   verifications_approved  PropertyVerification[]  @relation("VerifiedByUser")
   verifications_submitted PropertyVerification[]  @relation("SubmittedByUser")
   invites_sent            PropertyInvite[]        @relation("InvitesSent")
@@ -220,7 +220,7 @@ model User {
   property_profile        PropertyUserProfile[]
   staff                   Staff[]
   otp                     OTP[]
-  organization            Organization[]
+  businesses            Business[]
   notice_board                  NoticeBoard[]
 
   @@unique([email])
@@ -228,10 +228,10 @@ model User {
 }
 
 
-model Organization {
+model Business {
   id                    String     @id @default(cuid())
   owner_id     String
-  organization_name String
+  business_name String
   is_active Boolean
 
 
@@ -241,7 +241,7 @@ model Organization {
 
   property Property[]
 
-  @@unique([owner_id, organization_name])
+  @@unique([owner_id, business_name])
 }
 
 model OTP {
@@ -300,15 +300,15 @@ model Property {
   address             String
   description         String?
   created_by_id          String
-  organization_id       String
+  business_id       String
   number_of_units     Int                @default(0)
   is_public           Boolean            @default(false)
   verification_status VerificationStatus @default(not_required)
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt
 
-  organization          Organization  @relation(fields: [organization_id], references: [id])
-  created_by            User                   @relation("UserProperties", fields: [created_by_id], references: [id])
+  business          Business  @relation(fields: [business_id], references: [id])
+  created_by            User                   @relation("UserBusinesses", fields: [created_by_id], references: [id])
   units                Unit[]
   verifications        PropertyVerification[]
   invites              PropertyInvite[]
@@ -320,7 +320,7 @@ model Property {
   expenses             Expense[]
   reports              AnonymousReport[]
   notice_board      NoticeBoard[]
-  @@unique([name, created_by_id])
+  @@unique([name, created_by_id, business_id])
 }
 
 model Unit {
