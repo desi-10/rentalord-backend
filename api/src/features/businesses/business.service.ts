@@ -22,7 +22,7 @@ export const createBusinessesService = async (
 
   if (hasBusiness)
     throw new ApiError(
-      "You can not create more than one businesses",
+      "You can not create more than one business",
       StatusCodes.UNAUTHORIZED
     );
 

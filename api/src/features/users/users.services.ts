@@ -5,6 +5,7 @@ import { prisma } from "../../utils/db.js";
 import { TypeUser, TypeUserUpdate } from "./users.validator.js";
 import { hashed } from "../../utils/hash.js";
 import { getUserByIdUtil, getUserByPhoneNumber } from "./users.utils.js";
+import { MembershipRole } from "@prisma/client";
 
 export const createUser = async (data: TypeUser) => {
   const existingUser = await getUserByPhoneNumber(data.phone_number);
@@ -57,6 +58,27 @@ export const getUserById = async (userId: string) => {
       last_name: true,
       phone_number: true,
       email: true,
+      businesses: {
+        select: {
+          id: true,
+          business_name: true,
+        },
+      },
+      memberships: {
+        where: {
+          is_active: true,
+          role: MembershipRole.tenant,
+        },
+        select: {
+          id: true,
+          property: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
       properties: {
         select: {
           id: true,

@@ -492,6 +492,7 @@ model MaintenanceRequest {
   Expense     Expense[]
 }
 
+//property key here 
 model MaintenanceAssignment {
   id                     String           @id @default(cuid())
   maintenance_request_id String
