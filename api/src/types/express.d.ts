@@ -3,5 +3,6 @@ declare namespace Express {
     userId?: string;
     role?: string;
     propertyId?: string;
+    businessId?: string;
   }
 }

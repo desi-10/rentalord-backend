@@ -37,6 +37,7 @@ export const getAllUsers = async () => {
       phone_number: true,
       email: true,
       created_at: true,
+      businesses: true,
     },
     orderBy: { created_at: "desc" },
   });

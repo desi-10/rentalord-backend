@@ -6,6 +6,7 @@ import subscriptionplanRoutes from "../features/subscription-plans/subscriptionp
 import invitesRoutes from "../features/invites/invites.route.js";
 import unitsRoutes from "../features/unit/unit.route.js";
 import businessesRoutes from "../features/businesses/business.route.js";
+import propertiesRoutes from "../features/property/property.route.js";
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use("/subscription-plans", subscriptionplanRoutes);
 router.use("/invites", invitesRoutes);
 router.use("/units", unitsRoutes);
 router.use("/businesses", businessesRoutes);
+router.use("/properties", propertiesRoutes);
 
 export default router;

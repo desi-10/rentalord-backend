@@ -304,6 +304,8 @@ model Property {
   number_of_units     Int                @default(0)
   is_public           Boolean            @default(false)
   verification_status VerificationStatus @default(not_required)
+  image_url           String?
+  image_public_id     String?
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt
 
@@ -320,7 +322,9 @@ model Property {
   expenses             Expense[]
   reports              AnonymousReport[]
   notice_board      NoticeBoard[]
-  @@unique([name, created_by_id, business_id])
+
+  @@unique([name,  business_id])
+  @@unique([id, business_id])
 }
 
 model Unit {
