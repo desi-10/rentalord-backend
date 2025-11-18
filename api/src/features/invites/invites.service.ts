@@ -30,9 +30,13 @@ export const createInviteService = async (
       user_id: inviterId,
       property_id,
       is_active: true,
-      role: { in: ["landlord", "manager"] },
+      // role: { in: ["landlord", "manager"] },
     },
   });
+
+  console.log("membership", membership);
+
+  return apiResponse("Membership fetched successfully", membership);
 
   if (!membership) {
     throw new ApiError(
