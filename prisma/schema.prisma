@@ -240,7 +240,7 @@ model Business {
   updated_at DateTime @updatedAt
 
   property Property[]
-
+  property_invites PropertyInvite[]
   @@unique([owner_id, business_name])
 }
 
@@ -366,19 +366,26 @@ model PropertyVerification {
 }
 
 model PropertyInvite {
-  id           String       @id @default(cuid())
-  property_id  String
-  phone_number String?
-  role         InviteRole
-  invited_by_id   String
-  token        String
-  status       InviteStatus @default(pending)
-  expires_at   DateTime
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @updatedAt
+  id             String        @id @default(cuid())
+  property_id    String
+  business_id    String
+  phone_number   String?
+  role           InviteRole
+  invited_by_id  String
+  token          String        @unique
+  status         InviteStatus  @default(pending)
+  expires_at     DateTime
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
 
-  property  Property @relation(fields: [property_id], references: [id])
+  /// RELATIONS
+  property   Property @relation(fields: [property_id], references: [id])
+  business   Business @relation(fields: [business_id], references: [id])
   invited_by User     @relation("InvitesSent", fields: [invited_by_id], references: [id])
+
+  /// INDEXES & CONSTRAINTS
+  @@index([property_id, business_id])
+  @@unique([property_id, business_id, phone_number])
 }
 
 model PropertyMembership {
