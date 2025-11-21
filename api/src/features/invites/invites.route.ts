@@ -13,7 +13,7 @@ router.post("/accept", inviteController.acceptInviteController);
 
 router
   .route("/")
-  .get(authenticate, authorizeAdmin, inviteController.getInvitesController)
+  .get(authenticate, authorizeAdmin, inviteController.getAllInvitesController)
   .post(
     authenticate,
     authorizeAdmin,
