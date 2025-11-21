@@ -11,7 +11,15 @@ const app = express();
 app.use(createRateLimiter()); // ✅ apply before all routes
 app.use(httpLogger);
 
-app.use(cors({ origin: "*", credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      callback(null, true); // allow all origins
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
