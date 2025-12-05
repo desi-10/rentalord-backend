@@ -28,7 +28,11 @@ export const updatePropertySchema = z.object({
     .number()
     .min(1, "Number of units is required")
     .optional(),
-  is_public: z.coerce.boolean().default(false).optional(),
+  is_public: z
+    .string()
+    .transform((val) => val === "true")
+    .default(false)
+    .optional(),
   verification_status: z
     .enum(["not_required", "pending", "approved", "rejected"])
     .default("not_required")

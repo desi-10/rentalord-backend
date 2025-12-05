@@ -12,8 +12,34 @@ import {
 } from "./property.validator.js";
 import prisma from "../../utils/db.js";
 
+export const getAllActivePropertiesService = async (businessId: string) => {
+  const properties = await prisma.property.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+    where: { business_id: businessId, is_public: true, is_deleted: false },
+    select: {
+      id: true,
+      name: true,
+      address: true,
+      image_url: true,
+      is_public: true,
+      number_of_units: true,
+      description: true,
+      verification_status: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
+
+  return apiResponse("Properties fetched successfully", properties);
+};
+
 export const getAllPropertiesService = async (businessId: string) => {
   const properties = await prisma.property.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
     where: { business_id: businessId },
     select: {
       id: true,
@@ -81,8 +107,8 @@ export const getPropertyByIdService = async (
   businessId: string,
   propertyId: string
 ) => {
-  const property = await prisma.property.findUnique({
-    where: { id_business_id: { id: propertyId, business_id: businessId } },
+  const property = await prisma.property.findFirst({
+    where: { id: propertyId, business_id: businessId },
     select: {
       id: true,
       name: true,
@@ -93,8 +119,10 @@ export const getPropertyByIdService = async (
       description: true,
     },
   });
+
   if (!property)
     throw new ApiError("Property not found", StatusCodes.NOT_FOUND);
+
   return apiResponse("Property fetched successfully", property);
 };
 
@@ -156,6 +184,8 @@ export const updatePropertyService = async (
       await deleteFromCloudinary(property.image_public_id);
   }
 
+  console.log(is_public, "is_public");
+
   const updatedProperty = await prisma.property.update({
     where: { id_business_id: { id: propertyId, business_id: businessId } },
     select: {
@@ -172,7 +202,7 @@ export const updatePropertyService = async (
       address: address || property.address,
       description: description || property.description,
       number_of_units: number_of_units || property.number_of_units,
-      is_public: is_public || property.is_public,
+      is_public: is_public ?? property.is_public,
       verification_status: verification_status || property.verification_status,
       image_url: imageUrl || property.image_url,
       image_public_id: public_id || property.image_public_id,
@@ -192,8 +222,14 @@ export const deletePropertyService = async (
     throw new ApiError("Property not found", StatusCodes.NOT_FOUND);
   if (property.image_public_id)
     await deleteFromCloudinary(property.image_public_id);
-  await prisma.property.delete({
+
+  await prisma.property.update({
     where: { id_business_id: { id: propertyId, business_id: businessId } },
+    data: {
+      is_public: false,
+      is_deleted: true,
+    },
   });
+
   return apiResponse("Property deleted successfully");
 };

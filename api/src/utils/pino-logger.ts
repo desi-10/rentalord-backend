@@ -1,6 +1,7 @@
 // import { logger } from "./logger.js";
 import { Request } from "express";
 import { logger } from "./logger.js";
+import { env } from "./env.js";
 interface ErrorContext {
   method?: string;
   path?: string;
@@ -14,7 +15,7 @@ export async function logError(
   error: Error,
   context: ErrorContext = {}
 ): Promise<void> {
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = env.NODE_ENV === "development";
   const isOperational = context.isOperational ?? false;
   const statusCode = context.statusCode ?? 500;
 
@@ -22,7 +23,9 @@ export async function logError(
   if (isDev) return;
 
   const shouldNotify = !isOperational || statusCode >= 500;
-  if (!shouldNotify || !process.env.ERROR_WEBHOOK_URL) return;
+  if (!shouldNotify || !env.ERROR_WEBHOOK_URL) {
+    return;
+  }
 
   const log = {
     timestamp: new Date().toISOString(),
@@ -32,7 +35,7 @@ export async function logError(
   };
 
   try {
-    await fetch(process.env.ERROR_WEBHOOK_URL!, {
+    await fetch(env.ERROR_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

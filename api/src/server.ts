@@ -8,9 +8,6 @@ import { createRateLimiter } from "./utils/rate-limit.js";
 
 const app = express();
 
-app.use(createRateLimiter()); // ✅ apply before all routes
-app.use(httpLogger);
-
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -19,6 +16,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(createRateLimiter()); // ✅ apply before all routes
+app.use(httpLogger);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

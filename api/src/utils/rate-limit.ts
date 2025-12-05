@@ -1,18 +1,12 @@
 import { Duration, Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { Request, Response, NextFunction } from "express";
+import { env } from "./env.js";
 
 // Create a Redis connection (serverless compatible)
-// const redis = new Redis({
-//   url: process.env.UPSTASH_REDIS_REST_URL!,
-//   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-// });
-const UPSTASH_REDIS_REST_URL = "https://cunning-swan-19176.upstash.io";
-const UPSTASH_REDIS_REST_TOKEN =
-  "AUroAAIncDJhZmIyMGVjMTQ3YzA0YjlhYWEzYjU4MDhhN2FkNmE4YnAyMTkxNzY";
 const redis = new Redis({
-  url: UPSTASH_REDIS_REST_URL,
-  token: UPSTASH_REDIS_REST_TOKEN,
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 // Configure rate limiter — e.g., 50 requests per minute per IP
@@ -48,7 +42,16 @@ export function createRateLimiter(
 
       next();
     } catch (error) {
-      console.error("Rate limiter error:", error);
+      // Rate limiter failed - log but don't block requests in development
+      if (process.env.NODE_ENV === "development") {
+        console.warn(
+          "Rate limiter unavailable, allowing request:",
+          (error as Error).message
+        );
+      } else {
+        console.error("Rate limiter error:", error);
+      }
+      // Continue without rate limiting if Redis is unavailable
       next();
     }
   };
