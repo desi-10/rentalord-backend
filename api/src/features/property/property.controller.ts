@@ -8,6 +8,17 @@ export const getAllProperties = async (req: Request, res: Response) => {
   res.json(result);
 };
 
+export const getAllActivePropertiesController = async (
+  req: Request,
+  res: Response
+) => {
+  const businessId = req.businessId as string;
+  const result = await propertyService.getAllActivePropertiesService(
+    businessId
+  );
+  res.json(result);
+};
+
 export const createProperty = async (req: Request, res: Response) => {
   const businessId = req.businessId as string;
   const image = req.file as Express.Multer.File;

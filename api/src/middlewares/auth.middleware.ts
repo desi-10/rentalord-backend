@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import prisma from "../utils/db.js";
 import { verifyAccessToken } from "../utils/jwt.js";
 import { ApiError } from "../utils/api-error.js";
 import { StatusCodes } from "http-status-codes";
@@ -19,7 +18,6 @@ export async function authenticate(
   const token = authHeader.split(" ")[1];
   try {
     const payload = verifyAccessToken(token);
-    console.log(payload, "payload");
 
     const user = await getUserByIdUtil(payload.id);
     if (!user) throw new ApiError("Invalid token", StatusCodes.UNAUTHORIZED);

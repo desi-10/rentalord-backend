@@ -25,6 +25,14 @@ router
   );
 
 router
+  .route("/active")
+  .get(
+    authenticate,
+    businessMiddleware,
+    propertyController.getAllActivePropertiesController
+  );
+
+router
   .route("/:propertyId")
   .get(
     authenticate,

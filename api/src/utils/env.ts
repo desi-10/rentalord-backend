@@ -29,8 +29,8 @@ const EnvSchema = z.object({
   JWT_VERIFY_EMAIL_TOKEN_EXPIRES_IN: z.string().default("24h"),
   NODE_ENV: z.string().default("development"),
   ERROR_WEBHOOK_URL: z.string().optional(),
-  UPSTASH_REDIS_REST_URL: z.string(),
-  UPSTASH_REDIS_REST_TOKEN: z.string(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 });
 
 export type EnvType = z.infer<typeof EnvSchema>;
