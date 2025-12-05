@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../../utils/api-error.js";
 import { apiResponse } from "../../utils/api-response.js";
-import { prisma } from "../../utils/db.js";
+import prisma from "../../utils/db.js";
 import { TypeCreateBusiness } from "./business.validator.js";
 
 export const getAllBusinessesService = async (userId: string) => {

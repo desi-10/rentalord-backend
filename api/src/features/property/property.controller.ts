@@ -36,7 +36,6 @@ export const getPropertyByIdController = async (
 export const updatePropertyById = async (req: Request, res: Response) => {
   const businessId = req.businessId as string;
   const propertyId = req.params.propertyId as string;
-  const image = req.file as Express.Multer.File;
   const result = await propertyService.updatePropertyService(
     businessId,
     propertyId,

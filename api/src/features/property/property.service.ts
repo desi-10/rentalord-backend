@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../../utils/api-error.js";
 import { apiResponse } from "../../utils/api-response.js";
-import { prisma } from "../../utils/db.js";
 
 import {
   deleteFromCloudinary,
@@ -11,6 +10,7 @@ import {
   TypeCreateProperty,
   TypeUpdateProperty,
 } from "./property.validator.js";
+import prisma from "../../utils/db.js";
 
 export const getAllPropertiesService = async (businessId: string) => {
   const properties = await prisma.property.findMany({
@@ -128,13 +128,34 @@ export const updatePropertyService = async (
   });
   if (!property)
     throw new ApiError("Property not found", StatusCodes.NOT_FOUND);
+
+  if (data.name) {
+    const existingName = await prisma.property.findFirst({
+      where: {
+        business_id: businessId,
+        name: data.name,
+        NOT: { id: propertyId },
+      },
+    });
+
+    if (existingName) {
+      throw new ApiError(
+        "A property with this name already exists in your business.",
+        StatusCodes.CONFLICT
+      );
+    }
+  }
+
   let imageUrl = property.image_url;
   let public_id = property.image_public_id;
   if (image) {
     const uploadedImage = await uploadToCloudinary("properties", image.buffer);
     imageUrl = uploadedImage.secure_url || imageUrl;
     public_id = uploadedImage.public_id || public_id;
+    if (property.image_public_id)
+      await deleteFromCloudinary(property.image_public_id);
   }
+
   const updatedProperty = await prisma.property.update({
     where: { id_business_id: { id: propertyId, business_id: businessId } },
     select: {

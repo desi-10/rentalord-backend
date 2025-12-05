@@ -2,10 +2,10 @@ import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../../utils/api-error.js";
 import { apiResponse } from "../../utils/api-response.js";
-import { prisma } from "../../utils/db.js";
+import prisma from "../../utils/db.js";
 import { generateCode } from "../../utils/generate-code.js";
 import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt.js";
-import { hashed, compareHashed } from "../../utils/hash.js";
+import { compareHashed, hashed } from "../../utils/hash.js";
 import {
   TypeRegister,
   TypeLogin,

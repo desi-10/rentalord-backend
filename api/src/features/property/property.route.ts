@@ -35,8 +35,8 @@ router
     authenticate,
     businessMiddleware,
     validateParams(propertyIdParams),
-    validateSchema(updatePropertySchema),
     upload.single("image"),
+    validateSchema(updatePropertySchema),
     propertyController.updatePropertyById
   )
   .delete(

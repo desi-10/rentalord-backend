@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import crypto from "crypto";
-import { prisma } from "../../utils/db.js";
+import prisma from "../../utils/db.js";
 import { ApiError } from "../../utils/api-error.js";
 import { apiResponse } from "../../utils/api-response.js";
 import {

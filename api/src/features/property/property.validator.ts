@@ -9,7 +9,15 @@ export const createPropertySchema = z.object({
   verification_status: z
     .enum(["not_required", "pending", "approved", "rejected"])
     .default("not_required"),
-  image: z.instanceof(File).optional(),
+  image: z
+    .any()
+    .transform((val) => {
+      if (val instanceof File) return val;
+      if (val === "" || val === "null" || val === undefined) return null;
+      return null;
+    })
+    .nullable()
+    .optional(),
 });
 
 export const updatePropertySchema = z.object({
@@ -25,7 +33,15 @@ export const updatePropertySchema = z.object({
     .enum(["not_required", "pending", "approved", "rejected"])
     .default("not_required")
     .optional(),
-  image: z.instanceof(File, { message: "Invalid image file format" }),
+  image: z
+    .any()
+    .transform((val) => {
+      if (val instanceof File) return val;
+      if (val === "" || val === "null" || val === undefined) return null;
+      return null;
+    })
+    .nullable()
+    .optional(),
 });
 
 export const propertyIdParams = z.object({

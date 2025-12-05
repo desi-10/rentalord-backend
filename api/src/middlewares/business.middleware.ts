@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { prisma } from "../utils/db.js";
+import prisma from "../utils/db.js";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../utils/api-error.js";
 import { z } from "zod";

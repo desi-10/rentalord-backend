@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { addMinutes, differenceInMinutes } from "date-fns";
-import { prisma } from "../../utils/db.js";
+import prisma from "../../utils/db.js";
 import { LoginAttempt } from "@prisma/client";
 
 // import { prisma } from "../../../utils/db.js";
