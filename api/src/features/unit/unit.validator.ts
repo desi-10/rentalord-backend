@@ -19,6 +19,24 @@ export const createUnitSchema = z.object({
   rent_amount: z.coerce.number().min(0),
   status: UnitStatusEnum.optional(),
   description: z.string().optional(),
+  is_public: z
+    .string()
+    .transform((val) => (val === "true" ? true : false))
+    .default(false),
+  images: z
+    .array(
+      z
+        .any()
+        .transform((val) => {
+          if (val instanceof File) return val;
+          if (val === "" || val === "null" || val === undefined) return null;
+          return null;
+        })
+        .nullable()
+        .optional()
+    )
+    .optional()
+    .optional(),
 
   // Optional nested data
   tenancies: z
@@ -58,8 +76,8 @@ export const createUnitSchema = z.object({
     .optional(),
 });
 
-export const unitParams = z.object({
-  id: z.cuid(),
+export const unitIdParams = z.object({
+  unitId: z.cuid("Invalid unit ID format"),
 });
 
 export const updateUnitSchema = createUnitSchema.partial();

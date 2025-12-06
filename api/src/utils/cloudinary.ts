@@ -34,3 +34,17 @@ export const deleteFromCloudinary = (publicId: string) => {
     });
   });
 };
+
+export const uploadMultipleImages = async (
+  folder: string,
+  images: Express.Multer.File[]
+) => {
+  const uploads = await Promise.all(
+    images.map((img) => uploadToCloudinary(folder, img.buffer))
+  );
+
+  return uploads.map((u) => ({
+    image_url: u.secure_url,
+    image_public_id: u.public_id,
+  }));
+};

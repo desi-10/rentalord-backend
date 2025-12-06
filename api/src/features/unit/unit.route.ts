@@ -1,51 +1,50 @@
-import express from "express";
-import {
-  createUnits,
-  deleteUnitById,
-  getAllUnits,
-  getUnitById,
-  updateUnitController,
-} from "./unit.controller.js";
+import { Router } from "express";
+import { authenticate } from "../../middlewares/auth.middleware.js";
+import * as unitController from "./unit.controller.js";
 import { validateSchema } from "../../middlewares/validate.middleware.js";
 import {
   createUnitSchema,
-  unitParams,
+  unitIdParams,
   updateUnitSchema,
 } from "./unit.validator.js";
-import {
-  authenticate,
-  authorizeAdmin,
-} from "../../middlewares/auth.middleware.js";
+import { businessMiddleware } from "../../middlewares/business.middleware.js";
 import { validateParams } from "../../middlewares/params.middleware.js";
-import { membershipMiddleware } from "../../middlewares/memership.middleware.js";
-const router = express.Router();
+import { upload } from "../../utils/multer.js";
+
+const router = Router();
 
 router
   .route("/")
-  .get(getAllUnits)
+  .get(authenticate, businessMiddleware, unitController.getAllUnits)
   .post(
     authenticate,
-    authorizeAdmin,
+    businessMiddleware,
+    upload.array("images"),
     validateSchema(createUnitSchema),
-    createUnits
+    unitController.createUnit
   );
 
 router
-  .route("/:id")
-  .get(validateParams(unitParams), authenticate, getUnitById)
-  .patch(
-    validateParams(unitParams),
-    membershipMiddleware,
+  .route("/:unitId")
+  .get(
     authenticate,
-    authorizeAdmin,
+    businessMiddleware,
+    validateParams(unitIdParams),
+    unitController.getUnitById
+  )
+  .patch(
+    authenticate,
+    businessMiddleware,
+    validateParams(unitIdParams),
+    upload.array("images"),
     validateSchema(updateUnitSchema),
-    updateUnitController
+    unitController.updateUnitById
   )
   .delete(
-    validateParams(unitParams),
     authenticate,
-    authorizeAdmin,
-    deleteUnitById
+    businessMiddleware,
+    validateParams(unitIdParams),
+    unitController.deleteUnitById
   );
 
 export default router;

@@ -337,17 +337,31 @@ model Unit {
   rent_amount Decimal    @db.Decimal(10, 2)
   status      UnitStatus @default(available)
   description String?
+  is_public Boolean @default(false)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
-
+  is_deleted Boolean @default(false)
   property             Property             @relation(fields: [property_id], references: [id])
   tenancies            Tenancy[]
   maintenance_requests MaintenanceRequest[]
   expenses             Expense[]
-
+  images UnitImage[]
   @@unique([name, property_id])
   @@index([name, property_id])
 }
+
+model UnitImage {
+  id String @id @default(cuid())
+  unit_id String
+  image_url String
+  image_public_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  unit Unit @relation(fields: [unit_id], references: [id])
+}
+
+
 
 model PropertyVerification {
   id                  String             @id @default(cuid())

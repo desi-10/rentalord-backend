@@ -20,7 +20,7 @@ const envs = {
 
 const EnvSchema = z.object({
   PORT: z.string().optional(),
-  DATABASE_URL: z.string(),
+  DATABASE_URL: z.string().optional(),
   JWT_SECRET: z.string().default("secret"),
   JWT_REFRESH_SECRET: z.string().default("refresh-secret"),
   JWT_ACCESS_TOKEN_EXPIRES_IN: z.string().default("15m"),
